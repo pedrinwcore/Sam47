@@ -3,7 +3,8 @@ import { ChevronLeft, Play, Copy, Eye, Settings, Monitor, Smartphone, Globe, Cod
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
-import UniversalVideoPlayer from '../../components/UniversalVideoPlayer';
+import AdvancedVideoPlayer from '../../components/AdvancedVideoPlayer';
+import StreamingPlayerManager from '../../components/StreamingPlayerManager';
 
 interface PlayerConfig {
   id: string;
@@ -329,13 +330,21 @@ player.play();`,
       case 'universal':
         return (
           <div className="h-48 bg-black rounded-lg overflow-hidden">
-            <UniversalVideoPlayer
+            <AdvancedVideoPlayer
               src={sampleVideos[0]?.url || liveStreamUrl}
               title={sampleVideos[0]?.nome || 'Stream ao Vivo'}
               isLive={!sampleVideos[0]}
               autoplay={false}
               controls={true}
               className="w-full h-full"
+              streamStats={{
+                viewers: 15,
+                bitrate: 2500,
+                uptime: '01:23:45',
+                quality: '1080p'
+              }}
+              enableSocialSharing={true}
+              enableViewerCounter={true}
             />
           </div>
         );
@@ -654,13 +663,19 @@ player.play();`,
 
             {/* Player */}
             <div className={`w-full h-full ${isFullscreen ? 'p-0' : 'p-4 pt-16'}`}>
-              <UniversalVideoPlayer
+              <AdvancedVideoPlayer
                 src={previewVideo ? getVideoUrl(previewVideo.url) : undefined}
                 title={previewVideo?.nome}
                 isLive={previewVideo?.id === 0}
                 autoplay={true}
                 controls={true}
                 className="w-full h-full"
+                streamStats={previewVideo?.id === 0 ? {
+                  viewers: Math.floor(Math.random() * 50) + 5,
+                  bitrate: 2500,
+                  uptime: '00:15:30',
+                  quality: '1080p'
+                } : undefined}
                 onError={(error) => {
                   console.error('Erro no player:', error);
                   toast.error('Erro ao carregar vídeo');
@@ -673,7 +688,7 @@ player.play();`,
 
       {/* Informações Técnicas */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-blue-900 font-medium mb-3">📋 Informações dos Players</h3>
+        <h3 className="text-blue-900 font-medium mb-3">📋 Sistema de Streaming Avançado</h3>
         
         {/* Status das transmissões */}
         <div className="mb-4 p-3 bg-white rounded-md">
@@ -696,19 +711,22 @@ player.play();`,
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-blue-800 text-sm">
           <div>
-            <h4 className="font-medium mb-2">URLs de Stream:</h4>
+            <h4 className="font-medium mb-2">Recursos Avançados:</h4>
             <ul className="space-y-1">
-              <li>• <strong>Stream Ativo:</strong> {getActiveStreamUrl()}</li>
-              <li>• <strong>RTMP:</strong> rtmp://samhost.wcore.com.br:1935/samhost/{userLogin}_live</li>
+              <li>• <strong>Range Requests:</strong> Streaming otimizado</li>
+              <li>• <strong>Conversão Automática:</strong> MP4 compatível</li>
+              <li>• <strong>Qualidade Adaptativa:</strong> Baseada no plano</li>
+              <li>• <strong>Watermark Dinâmica:</strong> Logos personalizadas</li>
+              <li>• <strong>Social Sharing:</strong> Múltiplas plataformas</li>
             </ul>
           </div>
           <div>
-            <h4 className="font-medium mb-2">Compatibilidade:</h4>
+            <h4 className="font-medium mb-2">URLs de Streaming:</h4>
             <ul className="space-y-1">
-              <li>• <strong>Universal:</strong> Todos os navegadores</li>
-              <li>• <strong>HTML5:</strong> Navegadores modernos</li>
-              <li>• <strong>Mobile:</strong> iOS/Android</li>
-              <li>• <strong>iFrame:</strong> Sites externos</li>
+              <li>• <strong>HLS:</strong> {getActiveStreamUrl()}</li>
+              <li>• <strong>RTMP:</strong> rtmp://samhost.wcore.com.br:1935/samhost/{userLogin}_live</li>
+              <li>• <strong>Direct:</strong> URLs diretas do Wowza</li>
+              <li>• <strong>SSH Stream:</strong> Streaming via SSH otimizado</li>
             </ul>
           </div>
         </div>
@@ -721,6 +739,25 @@ player.play();`,
           </div>
         )}
       </div>
+
+      {/* Gerenciador de Streaming Avançado */}
+      <StreamingPlayerManager
+        videoUrl={getActiveStreamUrl()}
+        isLive={obsStreamActive || liveStreamActive}
+        title={obsStreamActive ? 'Transmissão OBS ao Vivo' : 
+               liveStreamActive ? 'Transmissão Playlist ao Vivo' : 
+               'Player de Demonstração'}
+        streamStats={{
+          viewers: Math.floor(Math.random() * 50) + 5,
+          bitrate: 2500,
+          uptime: '01:23:45',
+          quality: '1080p',
+          isRecording: false
+        }}
+        enableSocialSharing={true}
+        enableViewerCounter={true}
+        enableWatermark={true}
+      />
     </div>
   );
 };

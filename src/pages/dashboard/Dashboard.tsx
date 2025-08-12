@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useStream } from '../../context/StreamContext';
-import VideoPlayer from '../../components/VideoPlayer';
+import AdvancedVideoPlayer from '../../components/AdvancedVideoPlayer';
 import {
   Settings, Users, BarChart, FileVideo,
   PlayCircle, Play, Smartphone, RefreshCw, Radio, Square,
@@ -726,13 +726,29 @@ const Dashboard: React.FC = () => {
 
           {/* Player */}
           <div className="relative h-96">
-            <VideoPlayer
-              playlistVideo={getCurrentVideo()}
-              onVideoEnd={handleVideoEnd}
-              className="w-full h-full"
+            <AdvancedVideoPlayer
+              src={getCurrentVideo()?.url ? buildVideoUrl(getCurrentVideo()!.url) : 
+                   streamData.isLive ? `http://samhost.wcore.com.br:1935/samhost/${userLogin}_live/playlist.m3u8` :
+                   obsStreamActive ? obsStreamUrl : undefined}
+              title={getCurrentVideo()?.nome || 
+                     streamData.isLive ? streamData.title || 'Transmissão ao Vivo' :
+                     obsStreamActive ? 'Transmissão OBS ao Vivo' : undefined}
+              isLive={!getCurrentVideo() && (streamData.isLive || obsStreamActive)}
               autoplay={false}
               controls={true}
-              height="h-full"
+              className="w-full h-full"
+              aspectRatio="16:9"
+              streamStats={hasActiveTransmission ? {
+                viewers: totalViewers,
+                bitrate: activeBitrate,
+                uptime: activeUptime,
+                quality: '1080p',
+                isRecording: false
+              } : undefined}
+              onEnded={handleVideoEnd}
+              enableSocialSharing={true}
+              enableViewerCounter={hasActiveTransmission}
+              enableWatermark={true}
             />
 
             {/* Overlay para playlist */}

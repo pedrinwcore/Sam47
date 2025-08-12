@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight, PlusCircle, X, Edit2, Trash2, Play, Minimize, Maximize } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
-import UniversalVideoPlayer from '../../components/UniversalVideoPlayer';
+import AdvancedVideoPlayer from '../../components/AdvancedVideoPlayer';
 
 import {
   DndContext,
@@ -956,22 +956,22 @@ const Playlists: React.FC = () => {
 
             {/* Player Universal */}
             <div className={`w-full h-full ${isFullscreen ? 'p-0' : 'p-4 pt-16'}`}>
-              <video
+              <AdvancedVideoPlayer
                 src={currentVideoUrl}
-                className="w-full h-full object-contain"
+                title={playlistVideosToPlay[playlistPlayerIndex]?.nome}
+                isLive={false}
+                autoplay={true}
                 controls
-                autoPlay
-                preload="metadata"
+                className="w-full h-full"
+                aspectRatio="16:9"
                 onEnded={handleVideoEnded}
-                onError={(e) => {
-                  console.error('Erro no player:', e);
+                onError={(error) => {
+                  console.error('Erro no player:', error);
                   toast.error('Erro ao carregar vídeo');
                 }}
-              >
-                <source src={currentVideoUrl} type="video/mp4" />
-                <source src={currentVideoUrl} type="application/vnd.apple.mpegurl" />
-                Seu navegador não suporta reprodução de vídeo.
-              </video>
+                enableSocialSharing={true}
+                enableWatermark={true}
+              />
             </div>
 
             {/* Controles da playlist */}

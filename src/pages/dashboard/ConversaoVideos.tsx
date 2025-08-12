@@ -923,20 +923,25 @@ const ConversaoVideos: React.FC = () => {
 
             {/* Player HTML5 Simples */}
             <div className={`w-full h-full ${isFullscreen ? 'p-0' : 'p-4 pt-16'}`}>
-              <video
+              <AdvancedVideoPlayer
                 src={buildVideoUrl(currentVideo.url)}
-                className="w-full h-full object-contain"
+                title={currentVideo.nome}
+                isLive={false}
+                autoplay={true}
                 controls
-                autoPlay
-                preload="metadata"
+                className="w-full h-full"
+                aspectRatio="16:9"
                 onError={(e) => {
                   console.error('Erro no player:', e);
                   toast.error('Erro ao carregar vídeo. Tente abrir em nova aba.');
                 }}
-              >
-                <source src={buildVideoUrl(currentVideo.url)} type="video/mp4" />
-                Seu navegador não suporta reprodução de vídeo.
-              </video>
+                enableSocialSharing={false}
+                enableWatermark={false}
+                streamStats={{
+                  bitrate: currentVideo.current_bitrate,
+                  quality: `${currentVideo.formato_original?.toUpperCase()} • ${currentVideo.current_bitrate} kbps`
+                }}
+              />
             </div>
           </div>
         </div>

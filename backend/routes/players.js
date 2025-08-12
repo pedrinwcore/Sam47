@@ -8,7 +8,7 @@ const router = express.Router();
 // GET /api/players/iframe - Player iFrame
 router.get('/iframe', async (req, res) => {
   try {
-    const { stream, playlist, video } = req.query;
+    const { stream, playlist, video, player_type = 'html5' } = req.query;
     
     let videoUrl = '';
     let title = 'Player';
@@ -68,7 +68,10 @@ router.get('/iframe', async (req, res) => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
+    <link href="//vjs.zencdn.net/7.8.4/video-js.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="//vjs.zencdn.net/7.8.4/video.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.12.0/videojs-contrib-hls.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -119,6 +122,19 @@ router.get('/iframe', async (req, res) => {
             animation: pulse 1.5s infinite;
         }
         
+        .video-js {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .video-js .vjs-time-control {
+            display: ${isLive ? 'none' : 'block'} !important;
+        }
+        
+        .video-js .vjs-progress-control {
+            display: ${isLive ? 'none' : 'block'} !important;
+        }
+        
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
@@ -129,6 +145,18 @@ router.get('/iframe', async (req, res) => {
             color: white;
             text-align: center;
             padding: 20px;
+        }
+        
+        .viewer-counter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 14px;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -141,9 +169,14 @@ router.get('/iframe', async (req, res) => {
             <div>${title}</div>
         </div>
         
-        <video id="video" controls autoplay muted playsinline>
+        ${player_type === 'videojs' ? 
+          `<video id="video" class="video-js vjs-default-skin" controls autoplay muted playsinline data-setup='{"fluid": true}'>` :
+          `<video id="video" controls autoplay muted playsinline>`
+        }
             <p class="error-message">Seu navegador não suporta reprodução de vídeo.</p>
         </video>
+        
+        ${isLive ? '<div class="viewer-counter"><i class="fa fa-eye"></i> <span id="viewer-count">0</span></div>' : ''}
     </div>
 
     <script>
@@ -158,7 +191,24 @@ router.get('/iframe', async (req, res) => {
             // Detectar tipo de arquivo
             const isHLS = videoUrl.includes('.m3u8') || isLive;
             
-            if (isHLS && Hls.isSupported()) {
+            if ('${player_type}' === 'videojs') {
+                // Usar Video.js
+                const player = videojs('video', {
+                    html5: {
+                        hls: {
+                            overrideNative: true
+                        }
+                    },
+                    fluid: true,
+                    responsive: true
+                });
+                
+                player.src({
+                    src: videoUrl,
+                    type: 'application/x-mpegURL'
+                });
+                
+            } else if (isHLS && Hls.isSupported()) {
                 // Usar HLS.js para streams
                 const hls = new Hls({
                     enableWorker: true,
@@ -188,6 +238,21 @@ router.get('/iframe', async (req, res) => {
             } else {
                 // Vídeo regular
                 video.src = videoUrl;
+            }
+            
+            // Contador de espectadores para streams ao vivo
+            if (isLive) {
+                function updateViewerCount() {
+                    // Simular contador de espectadores
+                    const count = Math.floor(Math.random() * 50) + 5;
+                    const counterElement = document.getElementById('viewer-count');
+                    if (counterElement) {
+                        counterElement.textContent = count;
+                    }
+                }
+                
+                updateViewerCount();
+                setInterval(updateViewerCount, 30000);
             }
             
             // Event listeners

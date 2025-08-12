@@ -991,21 +991,25 @@ const GerenciarVideos: React.FC = () => {
 
             {/* Player HTML5 com URL direta do Wowza */}
             <div className={`w-full h-full ${isFullscreen ? 'p-0' : 'p-4 pt-16'}`}>
-              <video
+              <AdvancedVideoPlayer
                 src={videoUrl}
-                className="w-full h-full object-contain"
+                title={currentVideo.nome}
+                isLive={false}
+                autoplay={true}
                 controls
-                autoPlay
-                preload="metadata"
+                className="w-full h-full"
+                aspectRatio="16:9"
                 onError={(e) => {
                   console.error('Erro no player:', e);
                   toast.error('Erro ao carregar vídeo do Wowza. Tente abrir em nova aba.');
                 }}
-              >
-                <source src={videoUrl} type="video/mp4" />
-                <source src={videoHlsUrl} type="application/vnd.apple.mpegurl" />
-                Seu navegador não suporta reprodução de vídeo.
-              </video>
+                streamStats={{
+                  bitrate: currentVideo.bitrate_video,
+                  quality: `${currentVideo.formato_original?.toUpperCase()} • ${formatFileSize(currentVideo.tamanho || 0)}`
+                }}
+                enableSocialSharing={false}
+                enableWatermark={false}
+              />
             </div>
 
             {/* Informações técnicas */}
