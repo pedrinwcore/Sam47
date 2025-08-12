@@ -476,7 +476,7 @@ const StreamingPlayerManager: React.FC<StreamingPlayerManagerProps> = ({
               <span className="font-medium text-gray-700">URLs de Streaming:</span>
               <ul className="text-gray-600 mt-1 space-y-1">
                 <li>• <strong>HLS:</strong> {`${window.location.origin}/api/players/iframe?stream=${userLogin}_live`}</li>
-                <li>• <strong>RTMP:</strong> {`rtmp://samhost.wcore.com.br:1935/samhost/${userLogin}_live`}</li>
+                <li>• <strong>RTMP:</strong> {\`rtmp://samhost.wcore.com.br:1935/samhost/${userLogin}_live`}</li>
               </ul>
             </div>
             
